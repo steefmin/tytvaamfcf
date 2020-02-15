@@ -50,7 +50,7 @@
         let regex = new RegExp('v=([A-z0-9-_]+)');
         let url = document.getElementById('search').value
 
-        fetch('http://www.youtube.com/oembed?url=' + url)
+        fetch('https://www.youtube.com/oembed?url=' + url)
             .then(data => {
                 let error, videoId, results;
                 if (data.status !== 200) {
