@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-image: url("http://twoyoutubevideosandamotherfuckingcrossfader.com/purplestars.gif");
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header {
+            flex-wrap: nowrap;
+            width: min-content;
+            align-items: center;
+            padding-bottom: 50px;
+        }
+        .col {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: column;
+        }
+        .row {
+            display: flex;
+            flex-direction: row;
+        }
+        #volume {
+            margin: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="col header">
+    <img src="http://twoyoutubevideosandamotherfuckingcrossfader.com/twoyoutubevideos.gif" alt="Two Youtube Videos">
+    <img src="http://twoyoutubevideosandamotherfuckingcrossfader.com/amothefuckingcrossfader.gif" alt="A Motherfucking Crossfader">
+</div>
+<div class="row">
+    <div id="player-left"></div>
+    <div class="col">
+        <div class="row">
+            <button id="left" onclick="search(this.id)">Left</button>
+            <input type="text" id="search" placeholder="Youtube URL"/>
+            <button id="right" onclick="search(this.id)">Right</button>
+        </div>
+        <input type="range" id="volume" oninput="setVolume()"/>
+    </div>
+    <div id="player-right"></div>
+</div>
+<script>
+    function search(position) {
+        let regex = new RegExp('v=([A-z0-9-_]+)');
+        let url = document.getElementById('search').value
+
+        fetch('http://www.youtube.com/oembed?url=' + url)
+            .then(data => {
+                let error, videoId, results;
+                if (data.status !== 200) {
+                    error = 'video url not found';
+                    console.log(error);
+                    return {error, videoId}
+                }
+
+                results = url.match(regex);
+                if (Array.isArray(results) && results.length > 1) {
+                    console.log(results);
+                    return {error, videoId: results[1]};
+                }
+            })
+            .then(res => {
+                console.log(res);
+                if (!res.error) {
+                    newPlayer(position, res.videoId)
+                }
+            })
+    }
+
+    const volumeInput = document.getElementById('volume');
+    let setVolume = function () {};
+
+    var tag = document.createElement('script');
+
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    var playerL;
+    var playerR;
+
+    function newRightPlayer(videoId) {
+        playerR = generatePlayer('right', videoId)
+    }
+
+    function newLeftPlayer(videoId) {
+        playerL = generatePlayer('left', videoId);
+    }
+
+    function generatePlayer(position, videoId) {
+        return new YT.Player('player-' + position, {
+            height: '390',
+            width: '640',
+            videoId: videoId,
+            events: {
+                'onStateChange': onPlay
+            }
+        });
+    }
+
+    function onYouTubeIframeAPIReady() {
+        newLeftPlayer('VGkLPjkR9wA');
+        newRightPlayer('2Wgsj4eEd3Q');
+
+        setVolume = function () {
+            playerL.setVolume(100 - volumeInput.value)
+            playerR.setVolume(volumeInput.value)
+        }
+    }
+
+    function newPlayer(id, videoId) {
+        if (id === 'left') {
+            playerL.cueVideoById({videoId})
+        }
+        if (id === 'right') {
+            playerR.cueVideoById({videoId})
+        }
+    }
+
+    function onPlay(event) {
+        if (event.data == YT.PlayerState.PLAYING) {
+            setVolume()
+        }
+    }
+</script>
+</body>
+</html>
