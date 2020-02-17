@@ -48,42 +48,26 @@
 <script>
     function search(position) {
         let regex = new RegExp('v=([A-z0-9-_]+)');
-        let url = document.getElementById('search').value
+        let url = document.getElementById('search').value;
 
-        fetch('https://www.youtube.com/oembed?url=' + url, {mode: "no-cors"})
-            .then(data => {
-                let error, videoId, results;
-                if (data.status !== 200) {
-                    error = 'video url not found';
-                    console.log(error);
-                    return {error, videoId}
-                }
+        let results = url.match(regex);
+        console.log(results);
 
-                results = url.match(regex);
-                if (Array.isArray(results) && results.length > 1) {
-                    console.log(results);
-                    return {error, videoId: results[1]};
-                }
-            })
-            .then(res => {
-                console.log(res);
-                if (!res.error) {
-                    newPlayer(position, res.videoId)
-                }
-            })
+        if (Array.isArray(results) && results.length > 1) {
+            newPlayer(position, results[1])
+        }
     }
 
     const volumeInput = document.getElementById('volume');
     let setVolume = function () {};
 
-    var tag = document.createElement('script');
+    let tag = document.createElement('script');
 
     tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
+    let firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-    var playerL;
-    var playerR;
+    let playerL, playerR;
 
     function newRightPlayer(videoId) {
         playerR = generatePlayer('right', videoId)
